@@ -13,66 +13,19 @@ import {
 import { useRef, useState } from "react";
 import { data } from "./data/data";
 import { AntDesign } from "@expo/vector-icons";
+import Content from "./components/Content";
+import { appStyles } from "./app.style";
 
 const { width, height } = Dimensions.get("window");
 const IMAGE_WIDTH = width * 0.65;
 const IMAGE_HEIGHT = height * 0.7;
 const SPACING = 20;
 
-const Content: React.FC<any> = ({ item }) => {
-  return (
-    <View style={{ alignItems: "center" }}>
-      <Text
-        style={{
-          textAlign: "center",
-          fontWeight: "800",
-          fontSize: 16,
-          textTransform: "uppercase",
-        }}
-      >
-        {item.title}
-      </Text>
-      <Text
-        style={{
-          fontSize: 12,
-          opacity: 0.5,
-        }}
-      >
-        {item.desc}
-      </Text>
-      <View style={{ flexDirection: "row", marginTop: SPACING }}>
-        <Text
-          style={{
-            fontWeight: "900",
-            fontSize: 42,
-            letterSpacing: 3,
-            marginRight: 8,
-          }}
-        >
-          {item.price}
-        </Text>
-        <Text
-          style={{
-            fontSize: 16,
-            lineHeight: 36,
-            fontWeight: "800",
-            alignSelf: "flex-end",
-          }}
-        >
-          USD
-        </Text>
-      </View>
-    </View>
-  );
-};
-
-export default function App() {
+const App = () => {
   const scrollX = useRef(new Animated.Value(0)).current;
   const progress = Animated.modulo(Animated.divide(scrollX, width), width);
   const [card_index, setcard_index] = useState(0);
-  const trigger_animation = useRef(false);
   const flatListRef: any = useRef();
-  console.log(card_index);
 
   return (
     <View style={{ backgroundColor: "#A5F1FA", flex: 1 }}>
@@ -109,18 +62,6 @@ export default function App() {
                 },
               }
             )}
-            // onMomentumScrollBegin={() => {
-            //   trigger_animation.current = true;
-            // }}
-            // onMomentumScrollEnd={(event) => {
-            //   console.log(event.nativeEvent.contentOffset.x / width - 10);
-            //   if (trigger_animation) {
-            //     setcard_index(
-            //       Math.ceil(event.nativeEvent.contentOffset.x / width)
-            //     );
-            //   }
-            //   trigger_animation.current = false;
-            // }}
             showsHorizontalScrollIndicator={false}
             renderItem={({ item, index }) => {
               const inputRange = [
@@ -189,42 +130,24 @@ export default function App() {
             }}
           />
           <Animated.View
-            style={{
-              position: "absolute",
-              backgroundColor: "#fff",
-              height: 300,
-              width: 300,
-              top: SPACING * 2,
-              alignSelf: "center",
-              zIndex: -999,
-              shadowColor: "#000",
-              shadowOpacity: 1,
-              shadowRadius: 24,
-              shadowOffset: {
-                width: 0,
-                height: 0,
+            style={[
+              appStyles.cardContainer,
+              {
+                transform: [
+                  {
+                    perspective: 200 * 4,
+                  },
+                  {
+                    rotateY: progress.interpolate({
+                      inputRange: [0, 0.5, 1],
+                      outputRange: ["0deg", "90deg", "180deg"],
+                    }),
+                  },
+                ],
               },
-              transform: [
-                {
-                  perspective: 200 * 4,
-                },
-                {
-                  rotateY: progress.interpolate({
-                    inputRange: [0, 0.5, 1],
-                    outputRange: ["0deg", "90deg", "180deg"],
-                  }),
-                },
-              ],
-            }}
+            ]}
           ></Animated.View>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginHorizontal: 25,
-            }}
-          >
+          <View style={appStyles.buttonContainer}>
             <TouchableOpacity
               style={{
                 flexDirection: "row",
@@ -240,11 +163,7 @@ export default function App() {
               }}
             >
               <AntDesign name="swapleft" style={{ fontSize: 42 }} />
-              <Text
-                style={{ fontWeight: "bold", fontSize: 12, marginBottom: 5 }}
-              >
-                Prev
-              </Text>
+              <Text style={appStyles.buttonText}>Prev</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={{
@@ -260,11 +179,7 @@ export default function App() {
                 });
               }}
             >
-              <Text
-                style={{ fontWeight: "bold", fontSize: 12, marginBottom: 5 }}
-              >
-                Next
-              </Text>
+              <Text style={appStyles.buttonText}>Next</Text>
               <AntDesign name="swapright" style={{ fontSize: 42 }} />
             </TouchableOpacity>
           </View>
@@ -272,13 +187,15 @@ export default function App() {
       </SafeAreaView>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
+
+export default App;
